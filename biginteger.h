@@ -35,7 +35,17 @@ public:
     vector<int> a;
     int l = 0;
     int sign = 0;
-    BigInteger(int z) { //с явным не работает BigInteger a = 9;
+    BigInteger(uint64_t z)
+    {
+        while (z > 0)
+        {
+            a.push_back(z%10);
+            z/=10;
+            l++;
+        }
+    }
+    BigInteger(int64_t z)
+    {
         while (z > 0)
         {
             a.push_back(z%10);
@@ -53,6 +63,10 @@ public:
                 l++;
             }
         }
+    }
+    template<class T>
+    BigInteger(T some){
+        *this = BigInteger((int64_t)(some));
     }
     BigInteger ()
     {}
@@ -263,41 +277,15 @@ public:
         *this =  *this + other;
         return *this;
     }
-    BigInteger& operator*=(int other)
-    {
-        if(other < 0)
-            *this = -*this;
-        if(this->l == 0)
-            return *this;
-        other = abs(other);
-        int key = 0;
-        for(int i = 0; i < l-1; ++i)
-        {
-            a[i]*=other;
-            a[i]+=key;
-            key = a[i]/10;
-            a[i]%=10;
-        }
-        a[l-1]*=other;
-        a[l-1]+=key;
-        while(a[l-1] > 9)
-        {
-            a.push_back(a[l-1]/10);
-            a[l-1]%=10;
-            l++;
-        }
-        return *this;
-    }
 
-
-    BigInteger operator*(const BigInteger& other)
+    BigInteger operator*(BigInteger& other)
     {
         if(this->l == 1)
         {
             if(sign == other.sign || (sign == 0 && other.sign == 1))
-                return a[0]*other;
+                return multiply_with_int(other, a[0]);
             else
-                return -((a[0])*other);
+                return -((multiply_with_int(other, a[0])));
         }
         if(this->l == 0 || other.l == 0)
         {
@@ -474,123 +462,42 @@ public:
         BigInteger z(0);
         return (*this != z);
     }
+    BigInteger multiply_with_int(BigInteger &x, int other)
+    {
+        if(x.l == 0)
+            return x;
+        if(other > 9 || other < 0)
+        {
+            BigInteger newVal(other);
+            return x*newVal;
+        }
+        int key = 0;
+        BigInteger newVal = x;
+        for(int i = 0; i < x.l-1; ++i)
+        {
+            newVal.a[i] = x.a[i]*other;
+            newVal.a[i]+=key;
+            key=(newVal.a[i])/10;
+            newVal.a[i]%=10;
+        }
+        newVal.a[x.l-1]*=other;
+        newVal.a[x.l-1]+=key;
+        if(newVal.a[x.l-1] > 9)
+        {
+            int f = newVal.a[x.l-1];
+            newVal.a[x.l-1]%=10;
+            newVal.a.push_back(f/10);
+            newVal.l++;
+        }
+        newVal.get_zeros();
+        return newVal;
+    }
+
     friend ostream& operator<<(ostream& os, const BigInteger& x);
     friend istream& operator>>(istream& is, BigInteger& x);
-    friend BigInteger operator*(BigInteger &x, int other);
-    friend BigInteger operator*( int other, BigInteger x);
-    friend BigInteger operator+(BigInteger x, int other);
-    friend BigInteger operator+( int other, BigInteger x);
-    friend BigInteger operator-(BigInteger x, int other);
-    friend BigInteger operator-( int other, BigInteger x);
-    friend BigInteger operator/(BigInteger x, int other);
-    friend BigInteger operator/( int other, BigInteger x);
-    friend BigInteger operator%(BigInteger x, int other);
-    friend BigInteger operator%( int other, BigInteger x);
-    BigInteger& operator-=(int other)
-    {
-        *this = *this - other;
-        return *this;
-    }
-    BigInteger& operator+=(int other)
-    {
-        *this = *this + other;
-        return *this;
-    }
-    BigInteger& operator%=(int other)
-    {
-        *this = *this % other;
-        return *this;
-    }
 
 };
 
-
-
-
-
-
-BigInteger operator-(BigInteger x, int other)
-{
-    BigInteger a(other);
-    return x-a;
-}
-
-BigInteger operator-( int other, BigInteger x)
-{
-    return -(x-other);
-}
-
-BigInteger operator/(BigInteger x, int other)
-{
-    BigInteger a(other);
-    return x/a;
-}
-
-BigInteger operator/( int other, BigInteger x)
-{
-    BigInteger a(other);
-    return a/x;
-}
-
-BigInteger operator%(BigInteger x, int other)
-{
-    BigInteger a(other);
-    return x%a;
-}
-
-BigInteger operator%( int other, BigInteger x)
-{
-    BigInteger a(other);
-    return a%x;
-}
-
-
-
-BigInteger operator+(BigInteger x, int other)
-{
-    BigInteger a(other);
-    return x+a;
-}
-BigInteger operator+( int other, BigInteger x)
-{
-    BigInteger a(other);
-    return a+x;
-}
-
-BigInteger operator*(BigInteger &x, int other)
-{
-    if(x.l == 0)
-        return x;
-    if(other > 9 || other < 0)
-    {
-        BigInteger newVal(other);
-        return x*newVal;
-    }
-    int key = 0;
-    BigInteger newVal = x;
-    for(int i = 0; i < x.l-1; ++i)
-    {
-        newVal.a[i] = x.a[i]*other;
-        newVal.a[i]+=key;
-        key=(newVal.a[i])/10;
-        newVal.a[i]%=10;
-    }
-    newVal.a[x.l-1]*=other;
-    newVal.a[x.l-1]+=key;
-    if(newVal.a[x.l-1] > 9)
-    {
-        int f = newVal.a[x.l-1];
-        newVal.a[x.l-1]%=10;
-        newVal.a.push_back(f/10);
-        newVal.l++;
-    }
-    newVal.get_zeros();
-    return newVal;
-}
-BigInteger operator*(int other, BigInteger x)
-{
-    return x * other;
-}
 ostream& operator<<(ostream& os,  const BigInteger& x)
 {
     BigInteger ans = x;

@@ -4,10 +4,10 @@
 using namespace std;
 
 int main() {
-    BigInteger a = 0, b;
-    unsigned int z = 10;
-    a = 7;
-    cin >> a >> b;
-    cout << a%100;
+    BigInteger a = 2;
+    cout << a << endl;
+    unsigned int z = 100;
+    a = a + z;
+    cout << a;
     return 0;
 }
