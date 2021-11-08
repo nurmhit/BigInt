@@ -29,7 +29,6 @@ public:
         if(l == 0)
         {
             sign = 0;
-            //os << 0;
         }
     }
     vector<int> a;
@@ -74,7 +73,6 @@ public:
     {
         l = s.length();
         if(s[0] == '-') {
-            //l--;
             sign = 1;
         }
         for(int i = l - 1; i > -1; --i)
@@ -103,23 +101,22 @@ public:
     {
 
         get_zeros();
-        //other.get_zeros();
         if(*this == other)
-            return 0;
+            return false;
         if(sign == 0 && other.sign == 1)
         {
-            return 1;
+            return true;
         }
         if(sign == 1 && other.sign == 0)
         {
-            return 0;
+            return false;
         }
         if(sign == 0 && other.sign == 0)
         {
             if(l > other.l)
-                return 1;
+                return true;
             if(l < other.l)
-                return 0;
+                return false;
             if(l == other.l)
             {
                 int i1 = l - 1, i2 = other.l - 1;
@@ -129,12 +126,12 @@ public:
                     i2--;
                 }
                 if(a[i1] > other.a[i2])
-                    return 1;
+                    return true;
                 else
-                    return 0;
+                    return false;
             }
         }
-        return 0;
+        return false;
     }
     bool operator <(BigInteger& other)
     {
@@ -198,7 +195,7 @@ public:
             BigInteger ans;
             bool u[l];
             for (int i = 0; i < l; ++i) {
-                u[i] = 0;
+                u[i] = false;
             }
 
             int u1 = sign, u2 = other.sign;
@@ -225,7 +222,7 @@ public:
                                 ans.l++;
                             }
                         }
-                        u[j + 1] = 1;
+                        u[j + 1] = true;
                         a[j + 1]--;
                         i = j;
                     }
@@ -289,7 +286,7 @@ public:
         }
         if(this->l == 0 || other.l == 0)
         {
-            return BigInteger(0);
+            return BigInteger{0};
         }
         BigInteger newVal;
         for(int i = 0; i < l; ++i)
@@ -462,7 +459,7 @@ public:
         BigInteger z(0);
         return (*this != z);
     }
-    BigInteger multiply_with_int(BigInteger &x, int other)
+    static BigInteger multiply_with_int(BigInteger &x, int other)
     {
         if(x.l == 0)
             return x;
